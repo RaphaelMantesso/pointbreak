@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getPostBySlug, getPosts, convertContentToHTML, formatDate } from '@/lib/payload';
 
-// Mock data - later this will come from Payload CMS
-const blogPosts = {
+// Mock data - fallback if no posts in CMS
+const mockBlogPosts = {
   'beste-jobben-i-verden': {
     title: '"Det er den beste jobben i verden" – Feir International Surfedag med våre surfcoacher',
     category: 'SURF',
@@ -175,26 +176,60 @@ function addIdsToHeadings(html: string) {
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = blogPosts[slug as keyof typeof blogPosts];
 
-  if (!post) {
-    notFound();
+  // Default image for posts without valid image URL
+  const defaultImage = 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=1600&q=80';
+
+  // Try to fetch from Payload CMS first
+  let post = await getPostBySlug(slug);
+  let contentHTML = '';
+
+  if (post) {
+    // Convert Payload content to HTML
+    contentHTML = convertContentToHTML(post.content);
+    // Validate image URL
+    if (!post.image?.startsWith('http')) {
+      post.image = defaultImage;
+    }
+  } else {
+    // Fallback to mock data
+    const mockPost = mockBlogPosts[slug as keyof typeof mockBlogPosts];
+    if (!mockPost) {
+      notFound();
+    }
+    post = {
+      id: slug,
+      title: mockPost.title,
+      slug: slug,
+      category: mockPost.category as 'SURF' | 'REISE',
+      excerpt: '',
+      content: mockPost.content,
+      image: mockPost.image,
+      publishedDate: mockPost.date,
+      createdAt: mockPost.date,
+      updatedAt: mockPost.date
+    };
+    contentHTML = mockPost.content;
   }
 
   // Extract headings for table of contents
-  const headings = extractHeadings(post.content);
+  const headings = extractHeadings(contentHTML);
 
   // Add IDs to headings in content
-  const contentWithIds = addIdsToHeadings(post.content);
+  const contentWithIds = addIdsToHeadings(contentHTML);
 
-  // Get related posts (all posts except current one)
-  const relatedPosts = Object.entries(blogPosts)
-    .filter(([postSlug]) => postSlug !== slug)
-    .map(([postSlug, postData]) => ({
-      slug: postSlug,
-      ...postData
-    }))
-    .slice(0, 2); // Show only 2 related posts
+  // Get related posts
+  const allPosts = await getPosts();
+  const relatedPosts = allPosts
+    .filter(p => p.slug !== slug)
+    .slice(0, 2)
+    .map(p => ({
+      slug: p.slug,
+      title: p.title,
+      category: p.category,
+      date: formatDate(p.publishedDate),
+      image: p.image?.startsWith('http') ? p.image : defaultImage
+    }));
 
   return (
     <main className="min-h-screen pt-16">
@@ -226,7 +261,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Date */}
         <p className="mb-8 text-gray-600 uppercase tracking-wide">
-          {post.date}
+          {formatDate(post.publishedDate)}
         </p>
 
         {/* Table of Contents */}

@@ -1,37 +1,23 @@
 import BlogCard from './components/BlogCard';
+import { getPosts, formatDate } from '@/lib/payload';
 
-// Temporary mock data
-const blogPosts = [
-  {
-    id: 1,
-    title: '"Det er den beste jobben i verden" – Feir International Surfedag med våre surfcoacher',
-    category: 'SURF',
-    date: 'September 8, 2025',
-    excerpt: 'Finn frem surfbrettet og kjenn på spenningen, det er den internasjonale surfedagen!',
-    image: 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80',
-    slug: 'beste-jobben-i-verden'
-  },
-  {
-    id: 2,
-    title: 'Surfing i Portugal: De beste spotene for nybegynnere',
-    category: 'REISE',
-    date: 'September 5, 2025',
-    excerpt: 'Opplev de beste bølgene Portugal har å tilby for surfere på alle nivåer.',
-    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80',
-    slug: 'surfing-portugal'
-  },
-  {
-    id: 3,
-    title: 'Surfcamp i Frankrike: En guide til Atlanterhavskysten',
-    category: 'SURF',
-    date: 'September 1, 2025',
-    excerpt: 'Fra Biarritz til Hossegor - utforsk de beste surfcampene langs den franske kysten.',
-    image: 'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&q=80',
-    slug: 'surfcamp-frankrike'
-  }
-];
+export default async function Home() {
+  // Fetch posts from Payload CMS
+  const posts = await getPosts();
 
-export default function Home() {
+  // Default image for posts without valid image URL
+  const defaultImage = 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80';
+
+  // Transform posts to match BlogCard interface
+  const blogPosts = posts.slice(0, 3).map(post => ({
+    id: post.id,
+    title: post.title,
+    category: post.category,
+    date: formatDate(post.publishedDate),
+    excerpt: post.excerpt,
+    image: post.image?.startsWith('http') ? post.image : defaultImage,
+    slug: post.slug
+  }));
   return (
     <main className="min-h-screen pt-16">
       {/* Hero Section */}
@@ -64,11 +50,17 @@ export default function Home() {
           <h2 className="mb-12 text-4xl font-bold text-center text-foreground">
             Våre Reisebrev
           </h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
-            ))}
-          </div>
+          {blogPosts.length > 0 ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {blogPosts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-600">
+              Ingen blogginnlegg ennå. Opprett ditt første innlegg i Payload CMS!
+            </p>
+          )}
         </div>
       </section>
     </main>

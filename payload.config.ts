@@ -27,6 +27,9 @@ export default buildConfig({
       admin: {
         useAsTitle: 'title',
       },
+      access: {
+        read: () => true, // Allow public read access
+      },
       fields: [
         {
           name: 'title',
