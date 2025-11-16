@@ -23,6 +23,101 @@ export default buildConfig({
       ],
     },
     {
+      slug: 'hero',
+      admin: {
+        useAsTitle: 'title',
+      },
+      access: {
+        read: () => true,
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          label: 'Hovedtittel',
+        },
+        {
+          name: 'subtitle',
+          type: 'text',
+          required: true,
+          label: 'Undertittel',
+        },
+        {
+          name: 'backgroundImage',
+          type: 'text',
+          required: true,
+          label: 'Bakgrunnsbilde URL',
+        },
+      ],
+    },
+    {
+      slug: 'courses',
+      admin: {
+        useAsTitle: 'name',
+      },
+      access: {
+        read: () => true,
+      },
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          required: true,
+          label: 'Navn på Kurs/Destinasjon',
+        },
+        {
+          name: 'location',
+          type: 'text',
+          required: true,
+          label: 'Plassering',
+        },
+        {
+          name: 'price',
+          type: 'number',
+          required: true,
+          label: 'Pris (NOK)',
+        },
+        {
+          name: 'availableSpots',
+          type: 'number',
+          required: true,
+          label: 'Ledige Plasser',
+        },
+        {
+          name: 'highlights',
+          type: 'array',
+          required: true,
+          label: 'Høydepunkter',
+          fields: [
+            {
+              name: 'highlight',
+              type: 'text',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'image',
+          type: 'text',
+          required: true,
+          label: 'Bilde URL',
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          required: true,
+          label: 'Beskrivelse',
+        },
+        {
+          name: 'duration',
+          type: 'text',
+          required: true,
+          label: 'Varighet',
+        },
+      ],
+    },
+    {
       slug: 'posts',
       admin: {
         useAsTitle: 'title',

@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="bg-foreground text-white">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
+        <div className="grid gap-8 md:grid-cols-3">
           {/* Brand */}
           <div>
             <h3 className="text-2xl font-bold mb-4">POINT BREAK</h3>
@@ -37,17 +37,6 @@ export default function Footer() {
                   Kontakt
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Destinations */}
-          <div>
-            <h4 className="font-bold mb-4 text-lg">Destinasjoner</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>Portugal</li>
-              <li>Frankrike</li>
-              <li>Spania</li>
-              <li>Marokko</li>
             </ul>
           </div>
 

@@ -13,6 +13,29 @@ export interface Post {
   updatedAt: string;
 }
 
+export interface Hero {
+  id: string;
+  title: string;
+  subtitle: string;
+  backgroundImage: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  location: string;
+  price: number;
+  availableSpots: number;
+  highlights: Array<{ highlight: string; id?: string }>;
+  image: string;
+  description: string;
+  duration: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export async function getPosts(): Promise<Post[]> {
   try {
     const res = await fetch(`${PAYLOAD_API_URL}/posts?limit=100`, {
@@ -102,11 +125,51 @@ export function convertContentToHTML(content: any): string {
 // Helper function to format date
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  const options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   };
   return date.toLocaleDateString('no-NO', options);
+}
+
+// Get Hero section
+export async function getHero(): Promise<Hero | null> {
+  try {
+    const res = await fetch(`${PAYLOAD_API_URL}/hero?limit=1`, {
+      next: { revalidate: 60 }
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch hero:', res.status);
+      return null;
+    }
+
+    const data = await res.json();
+    return data.docs?.[0] || null;
+  } catch (error) {
+    console.error('Error fetching hero:', error);
+    return null;
+  }
+}
+
+// Get all Courses
+export async function getCourses(): Promise<Course[]> {
+  try {
+    const res = await fetch(`${PAYLOAD_API_URL}/courses?limit=100`, {
+      next: { revalidate: 60 }
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch courses:', res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    return data.docs || [];
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    return [];
+  }
 }
 
